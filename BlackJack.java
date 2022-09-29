@@ -3,193 +3,299 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class BlackJack {
+    private static int cardsLeftInDeck = 48;
 
-    // fill in code here
-    // define data members
 
-    
+
     public static void buildDeck(ArrayList<Card> deck) {
-	// fill in code here
-	// Given an empty deck, construct a standard deck of playing cards
+        int deckIndexCounter = 0;
+        if(deck.size()>0){
+            deck.clear();
+        }
+        for(int i =0;i<4;i++) {
+            String[] suitArray = new String[]{"club", "diamond", "heart", "spade"};
+            for (int k = 2; k < 11; k++) {
+                deck.add(new Card(k, "numberCard", suitArray[i]));
+            }
+            deck.add(new Card(11,"Ace",suitArray[i]));
+            deck.add(new Card(10,"Queen",suitArray[i]));
+            deck.add(new Card(10,"King",suitArray[i]));
+            deck.add(new Card(10,"Jack",suitArray[i]));
+            
+        }
+
     }
 
     public static void initialDeal(ArrayList<Card> deck, ArrayList<Card> playerHand, ArrayList<Card> dealerHand){
-	// fill in code here
-	// Deal two cards from the deck into each of the player's hand and dealer's hand 
+        if(dealerHand.size()>0 || playerHand.size()>0){
+            dealerHand.clear();
+            playerHand.clear();
+        }
+        int initialRandomIndexPlayer = (int) (Math.random()*52);
+        playerHand.add(deck.get(initialRandomIndexPlayer));
+        deck.remove(initialRandomIndexPlayer);
+
+        int initial2RandomIndexPlayer = (int) (Math.random()*51);
+        playerHand.add(deck.get(initial2RandomIndexPlayer));
+        deck.remove(initial2RandomIndexPlayer);
+
+        int initialRandomIndexDealer = (int) (Math.random()*50);
+        dealerHand.add(deck.get(initialRandomIndexDealer));
+        deck.remove(initialRandomIndexDealer);
+
+        int initial2RandomIndexDealer = (int) (Math.random()*49);
+        dealerHand.add(deck.get(initial2RandomIndexDealer));
+        deck.remove(initial2RandomIndexDealer);
+
+        System.out.println("remaining cards: " + deck.size());
+
     }
 
     public static void dealOne(ArrayList<Card> deck, ArrayList<Card> hand){
-	// fill in code here
-	// this should deal a single card from the deck to the hand
+        int randomlyDealtCard = (int) (Math.random()*cardsLeftInDeck);
+        deck.remove(randomlyDealtCard);
+        hand.add(deck.get(randomlyDealtCard));
+        cardsLeftInDeck -= 1;
+        System.out.println("remaining cards: " + deck.size());
+
+
     }
 
     public static boolean checkBust(ArrayList<Card> hand){
-	// fill in code here
-	// This should return whether a given hand's value exceeds 21
-	return false;
+
+        int totalHandValue = 0;
+        int fourAcesReached = 0;
+        for(Card p: hand){
+            totalHandValue += p.number;
+        }
+        while(totalHandValue>21&&hand.contains("Ace")&&fourAcesReached<4){
+            fourAcesReached+=1;
+            totalHandValue-=10;
+        }
+        if(totalHandValue>21){
+            return true;
+        }else {
+            return false;
+        }
     }
 
+
     public static boolean dealerTurn(ArrayList<Card> deck, ArrayList<Card> hand){
-	// fill in code here
-	// This should conduct the dealer's turn and
-	// Return true if the dealer busts; false otherwise
-	return false;
+        int dealerTotalHandValue = 0;
+        for(Card x: hand){
+            dealerTotalHandValue += x.number;
+        }
+        while(dealerTotalHandValue<17) {
+            dealOne(deck, hand);
+            dealerTotalHandValue = 0;
+            for(Card x: hand){
+                dealerTotalHandValue += x.number;
+            }
+        }
+        if(dealerTotalHandValue>=17 && dealerTotalHandValue<=21){
+            return false;
+        }else{
+            return true;
+        }
+
+
+
     }
 
     public static int whoWins(ArrayList<Card> playerHand, ArrayList<Card> dealerHand){
-	// fill in code here
-	// This should return 1 if the player wins and 2 if the dealer wins
-	return 0;
+        // fill in code here
+        int finalPlayerHandValue = 0;
+        int finalDealerHandValue = 0;
+        for(Card z: playerHand){
+            finalPlayerHandValue += z.number;
+        }
+        for(Card i: dealerHand){
+            finalDealerHandValue += i.number;
+        }
+        if(finalPlayerHandValue>finalDealerHandValue){
+            return 1;
+    }else if(finalDealerHandValue>finalPlayerHandValue){
+            return 2;
+        }else{
+            return 2;
+        }
     }
 
     public static String displayCard(ArrayList<Card> hand){
-	// fill in code here
-	// Return a string describing the card which has index 1 in the hand
-	return null;
+        return (Card.toString(hand.get(0)));
+
     }
 
     public static String displayHand(ArrayList<Card> hand){
-	// fill in code here
-	// Return a string listing the cards in the hand
-	return null;
+        String handReturned = "";
+        for(Card a: hand){
+            handReturned = handReturned + (Card.toString(a)) + " ";
+        }
+        return handReturned;
+
     }
 
-    // fill in code here (Optional)
-    // feel free to add methods as necessary
+
 
 
     public static void main(String[] args) {
 
-		int playerChoice, winner;
-		ArrayList<Card> deck = new ArrayList<Card>();
-		
-		
-		playerChoice = JOptionPane.showConfirmDialog(
-			null, 
-			"Ready to Play Blackjack?", 
-			"Blackjack", 
-			JOptionPane.OK_CANCEL_OPTION
-		);
+        int playerChoice, winner;
+        ArrayList<Card> deck = new ArrayList<Card>();
 
-		if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
-		    System.exit(0);
-		
-		Object[] options = {"Hit","Stand"};
-		boolean isBusted;	// Player busts? 
-		boolean dealerBusted;
-		boolean isPlayerTurn;
-		ArrayList<Card> playerHand = new ArrayList<>();
-		ArrayList<Card> dealerHand = new ArrayList<>();
-	
-		do{ // Game loop
-			buildDeck(deck);  // Initializes the deck for a new game
-		    initialDeal(deck, playerHand, dealerHand);
-		    isPlayerTurn=true;
-		    isBusted=false;
-		    dealerBusted=false;
-		    
-		    while(isPlayerTurn){
 
-				// Shows the hand and prompts player to hit or stand
-				playerChoice = JOptionPane.showOptionDialog(
-					null,
-					"Dealer shows " + displayCard(dealerHand) + "\n Your hand is: " 
-						+ displayHand(playerHand) + "\n What do you want to do?",
-					"Hit or Stand",
-				   JOptionPane.YES_NO_OPTION,
-				   JOptionPane.QUESTION_MESSAGE,
-				   null,
-				   options,
-				   options[0]
-				);
+        playerChoice = JOptionPane.showConfirmDialog(
+                null,
+                "Ready to Play Blackjack?",
+                "Blackjack",
+                JOptionPane.OK_CANCEL_OPTION
+        );
 
-				if(playerChoice == JOptionPane.CLOSED_OPTION)
-				    System.exit(0);
-				
-				else if(playerChoice == JOptionPane.YES_OPTION){
-				    dealOne(deck, playerHand);
-				    isBusted = checkBust(playerHand);
-				    if(isBusted){
-						// Case: Player Busts
-						playerChoice = JOptionPane.showConfirmDialog(
-							null,
-							"Player has busted!", 
-							"You lose", 
-							JOptionPane.OK_CANCEL_OPTION
-						);
+        if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
+            System.exit(0);
 
-						if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
-						    System.exit(0);
-						
-						isPlayerTurn=false;
-				    }
-				}
-			    
-				else{
-				    isPlayerTurn=false;
-				}
-		    }
+        Object[] options = {"Hit","Stand"};
+        boolean isBusted;	// Player busts?
+        boolean dealerBusted;
+        boolean isPlayerTurn;
+        ArrayList<Card> playerHand = new ArrayList<>();
+        ArrayList<Card> dealerHand = new ArrayList<>();
 
-		    if(!isBusted){ // Continues if player hasn't busted
-				dealerBusted = dealerTurn(deck, dealerHand);
-				if(dealerBusted){ // Case: Dealer Busts
-				    playerChoice = JOptionPane.showConfirmDialog(
-				    	null, 
-				    	"The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: " 
-				    		+ displayHand(playerHand) + "\nThe dealer busted.\n Congrautions!", 
-				    	"You Win!!!", 
-				    	JOptionPane.OK_CANCEL_OPTION
-				    );		    
+        do{
+            buildDeck(deck);
 
-					if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
-						System.exit(0);
-				}
-			
-			
-				else{ //The Dealer did not bust.  The winner must be determined
-				    winner = whoWins(playerHand, dealerHand);
+            for(Card c: deck) {
+                System.out.println(Card.toString(c));
+            }
+            initialDeal(deck, playerHand, dealerHand);
+            for(Card b: playerHand){
+                System.out.print(Card.toString(b));
+            }
 
-				    if(winner == 1){ //Player Wins
-						playerChoice = JOptionPane.showConfirmDialog(
-							null, 
-							"The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: " 
-								+ displayHand(playerHand) + "\n Congrautions!", 
-							"You Win!!!", 
-							JOptionPane.OK_CANCEL_OPTION
-						);
+            isPlayerTurn=true;
+            isBusted=false;
+            dealerBusted=false;
 
-						if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
-						    System.exit(0);
-				    }
+            while(isPlayerTurn){
 
-				    else{ //Player Loses
-						playerChoice = JOptionPane.showConfirmDialog(
-							null, 
-							"The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: " 
-								+ displayHand(playerHand) + "\n Better luck next time!", 
-							"You lose!!!", 
-							JOptionPane.OK_CANCEL_OPTION
-						); 
-					
-						if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
-						    System.exit(0);
-				    }
-				}
-		    }
-		}while(true);
+                playerChoice = JOptionPane.showOptionDialog(
+                        null,
+                        "Dealer shows " + displayCard(dealerHand) + "\n Your hand is: "
+                                + displayHand(playerHand) + "\n What do you want to do?",
+                        "Hit or Stand",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]
+                );
+
+                if(playerChoice == JOptionPane.CLOSED_OPTION)
+                    System.exit(0);
+
+                else if(playerChoice == JOptionPane.YES_OPTION){
+                    dealOne(deck, playerHand);
+                    //checkpoint delete after
+                    for(Card f : playerHand){
+                        System.out.println("playerhand is now: " + Card.toString(f));
+                    }
+
+                    isBusted = checkBust(playerHand);
+                    if(isBusted){
+                        playerChoice = JOptionPane.showConfirmDialog(
+                                null,
+                                "Player has busted!",
+                                "You lose",
+                                JOptionPane.OK_CANCEL_OPTION
+                        );
+
+                        if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
+                            System.exit(0);
+
+                        isPlayerTurn=false;
+                    }
+                }
+
+                else{
+                    isPlayerTurn=false;
+                }
+            }
+
+            if(!isBusted){
+                dealerBusted = dealerTurn(deck, dealerHand);
+                if(dealerBusted){ // Case: Dealer Busts
+                    playerChoice = JOptionPane.showConfirmDialog(
+                            null,
+                            "The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: "
+                                    + displayHand(playerHand) + "\nThe dealer busted.\n Congratulations!",
+                            "You Win!!!",
+                            JOptionPane.OK_CANCEL_OPTION
+                    );
+
+                    if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
+                        System.exit(0);
+                }
+
+
+                else{
+                    winner = whoWins(playerHand, dealerHand);
+
+                    if(winner == 1){ //Player Wins
+                        playerChoice = JOptionPane.showConfirmDialog(
+                                null,
+                                "The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: "
+                                        + displayHand(playerHand) + "\n Congratulations!",
+                                "You Win!!!",
+                                JOptionPane.OK_CANCEL_OPTION
+                        );
+
+                        if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
+                            System.exit(0);
+                    }
+
+                    else{ //Player Loses
+                        playerChoice = JOptionPane.showConfirmDialog(
+                                null,
+                                "The dealer's hand: " +displayHand(dealerHand) + "\n \n Your hand: "
+                                        + displayHand(playerHand) + "\n Better luck next time!",
+                                "You lose!!!",
+                                JOptionPane.OK_CANCEL_OPTION
+                        );
+
+                        if((playerChoice == JOptionPane.CLOSED_OPTION) || (playerChoice == JOptionPane.CANCEL_OPTION))
+                            System.exit(0);
+                    }
+                }
+            }
+        }while(true);
     }
 }
 
 
 
 class Card {
-	// Specify data fields for an individual card
-	int number;
-	int suit;
 
+    int number;
+    String suit;
+    String faceCardName;
 
-	Card(givenNumber, givenSuit){
-		number = givenNumber;
-		suit = givenSuit;
-	}
+    Card(int givenNumber, String givenSuit){
+        number = givenNumber;
+        suit = givenSuit;
+
+    }
+    Card(int givenNumber, String faceCard, String givenSuit){
+        number = givenNumber;
+        faceCardName = faceCard;
+        suit = givenSuit;
+    }
+
+    static String toString(Card c) {
+        if(c.faceCardName.equals("Ace")||c.faceCardName.equals("Jack")||c.faceCardName.equals("Queen")||c.faceCardName.equals("King")){
+            return c.faceCardName + " " + c.suit;
+        }
+        else{
+            return c.number + " " + c.suit;
+        }
+    }
 }
